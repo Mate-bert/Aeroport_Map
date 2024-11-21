@@ -61,16 +61,31 @@ public class World {
         return Math.sqrt(distance); // retourne la norme simplifiée
     }
 
-
     public Aeroport findNearest(double longitude, double latitude) {
         Aeroport nearest = null;
         double minDistance = Double.MAX_VALUE;
+        double earthRadius = 6371.0; // Rayon de la Terre en kilomètres
 
-        for (Aeroport aeroport : list) {
-            double distance = new Aeroport("", "", "", latitude, longitude).calculDistance(aeroport);
+        for (Aeroport airport : list) { // Utilise "list" au lieu de "aeroportList"
+            double airportLat = Math.toRadians(airport.getLatitude());
+            double airportLon = Math.toRadians(airport.getLongitude());
+            double clickLat = Math.toRadians(latitude);
+            double clickLon = Math.toRadians(longitude);
+
+            // Calcul de la distance haversine
+            double deltaLat = clickLat - airportLat;
+            double deltaLon = clickLon - airportLon;
+
+            double a = Math.pow(Math.sin(deltaLat / 2), 2)
+                    + Math.cos(airportLat) * Math.cos(clickLat) * Math.pow(Math.sin(deltaLon / 2), 2);
+
+            double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            double distance = earthRadius * c;
+
+            // Mise à jour du minimum
             if (distance < minDistance) {
                 minDistance = distance;
-                nearest = aeroport;
+                nearest = airport;
             }
         }
 
@@ -86,4 +101,3 @@ public class World {
         return null; // Si aucun aéroport trouvé avec ce code
     }
 }
-
